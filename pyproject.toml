@@ -1,7 +1,7 @@
 [project]
-name = "arxiv-filter"
+name = "arxiv-discovery"
 version = "0.1.0"
-description = "arXiv の新着から良い感じの論文をフィルタリングするツール"
+description = "A tool for discovering research papers from arXiv."
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
