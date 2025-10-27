@@ -1,5 +1,5 @@
 import os
-import re
+import datetime
 import json5
 import feedparser
 from sentence_transformers import SentenceTransformer
@@ -24,7 +24,7 @@ class Entry:
 def normalize_text(text: str, L2T: LatexNodes2Text) -> str:
     text = L2T.latex_to_text(text)
     text = unicodedata.normalize("NFC", text)
-    return json5.dumps(text, ensure_ascii=False)
+    return text
 
 def fetch_feeds(config) -> list[Entry]:
     L2T = LatexNodes2Text(math_mode="verbatim")
@@ -58,7 +58,7 @@ def create_preference_vector(config, model: SentenceTransformer) -> np.ndarray:
         vec += v * ww
     return vec
 
-def rank_papers(config, model: SentenceTransformer, entries: list[Entry], vec: np.ndarray) -> list[tuple[float, bool, Entry]]:
+def rank_papers(config, model: SentenceTransformer, entries: list[Entry], vec: np.ndarray) -> list[tuple[float, Entry]]:
     texts = [entry.title + " " + entry.summary for entry in entries]
     paper_vecs = model.encode(texts, normalize_embeddings=True)
     trusted_authors = set(config.get("trusted_authors", []))
@@ -66,26 +66,29 @@ def rank_papers(config, model: SentenceTransformer, entries: list[Entry], vec: n
     results = []
     for entry, v in zip(entries, paper_vecs):
         score = float(np.dot(vec, v))
-        is_trusted = False
-        if trusted_authors.intersection(set(entry.authors)):
-            score += config.get("trusted_authors_bonus", 0)
-            is_trusted = True
-        results.append((score, is_trusted, entry))
+        if not trusted_authors.isdisjoint(set(entry.authors)):
+            score += config.get("trusted_author_bonus", 0)
+        results.append((score, entry))
     results.sort(key=lambda x: x[0], reverse=True)
     return results
 
-def write_results(results: list[tuple[float, bool, Entry]]):
+def write_results(results: list[tuple[float, Entry]], now: datetime.datetime):
+    now_str = now.strftime("%Y-%m-%d %H:%M:%S")
+    output = {
+        "fetched_at": now_str,
+        "papers": [
+            {
+                "score": score,
+                "title": entry.title,
+                "link": entry.link,
+                "authors": entry.authors,
+                "summary": entry.summary,
+            }
+            for score, entry in results
+        ]
+    }
     with open("results.json5", "w", encoding="utf-8") as f:
-        f.write("[\n")
-        for score, is_trusted, entry in results:
-            f.write("  {\n")
-            f.write(f"    score: {score:.4f},\n")
-            f.write(f"    title: {entry.title},\n")
-            f.write(f"    link: \"{entry.link}\",\n")
-            f.write(f"    authors: [{', '.join(f'{x}' for x in entry.authors)}],\n")
-            f.write(f"    summary: {entry.summary},\n")
-            f.write("  },\n")
-        f.write("]\n")
+        f.write(json5.dumps(output, ensure_ascii=False, indent=2))
 
 def main():
     print("Loading settings...", end="", flush=True)
@@ -97,6 +100,7 @@ def main():
     print("Done.")
 
     print("Fetching new entries from feeds...", end="", flush=True)
+    now = datetime.datetime.now()
     entries = fetch_feeds(config)
     print("Done.")
     print("Total new entries fetched:", len(entries))
@@ -110,7 +114,7 @@ def main():
     print("Done.")
 
     print("Writing results to results.json5...", end="", flush=True)
-    write_results(results)
+    write_results(results, now)
     print("Done.")
 
 if __name__ == "__main__":

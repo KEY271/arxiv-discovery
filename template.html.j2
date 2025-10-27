@@ -60,6 +60,10 @@
         .author + .author::before {
             content: ", ";
         }
+        .trusted {
+            color: rgb(222, 32, 70);
+            font-weight: bold;
+        }
         summary {
             cursor: pointer;
         }
@@ -71,21 +75,22 @@
 <body>
     <main>
         <h1>arXiv Filter</h1>
+        <p>Fetched at: {{ fetched_at|e }}</p>
         {% for paper in papers %}
         <article>
-            <h2><a href="{{ paper.link|undump|e }}">{{ paper.title|undump|e }}</a></h2>
+            <h2><a href="{{ paper.link|undump|e }}" target="_blank" rel="noopener noreferrer">{{ paper.title|undump|e }}</a></h2>
 
             <p class="score">
-                Score: {{ paper.score|undump|e }}
+                Score: {{ paper.score|round(2)|e }}
             </p>
 
             <p class="link">
-                <a href="{{ paper.link|undump|e }}">{{ paper.link|undump|e }}</a>
+                <a href="{{ paper.link|undump|e }}" target="_blank" rel="noopener noreferrer">{{ paper.link|e }}</a>
             </p>
 
             <p class="authors">
             {%- for author in paper.authors -%}
-                <span class="author">{{ author|undump|e }}</span>
+                <span class="author">{{ author|undump|e|trusted }}</span>
             {%- endfor -%}
             </p>
 
