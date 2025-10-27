@@ -5,6 +5,17 @@
         "https://export.arxiv.org/rss/math-ph",
     ],
     trusted_authors: [
-        "Sheng-Jie Huang",
+        "Edward Witten",
     ],
+    keywords: [
+        "quantum field theory",
+    ],
+    liked_texts: [
+        "Quantum Field Theory and the Jones Polynomial"
+    ],
+    weights: {
+        keywords: 3,
+        liked_texts: 10,
+    },
+    trusted_author_bonus: 10,
 }
