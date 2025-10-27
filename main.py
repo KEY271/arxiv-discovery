@@ -24,7 +24,7 @@ class Entry:
 def normalize_text(text: str, L2T: LatexNodes2Text) -> str:
     text = L2T.latex_to_text(text)
     text = unicodedata.normalize("NFC", text)
-    return re.sub(r'(?<!\\)"', r'\\"', text.strip().replace("\n", "\\n"))
+    return json5.dumps(text, ensure_ascii=False)
 
 def fetch_feeds(config) -> list[Entry]:
     L2T = LatexNodes2Text(math_mode="verbatim")
@@ -80,10 +80,10 @@ def write_results(results: list[tuple[float, bool, Entry]]):
         for score, is_trusted, entry in results:
             f.write("  {\n")
             f.write(f"    score: {score:.4f},\n")
-            f.write(f"    title: \"{entry.title}\",\n")
+            f.write(f"    title: {entry.title},\n")
             f.write(f"    link: \"{entry.link}\",\n")
-            f.write(f"    authors: [{', '.join(f'\"{x}\"' for x in entry.authors)}],\n")
-            f.write(f"    summary: \"{entry.summary}\",\n")
+            f.write(f"    authors: [{', '.join(f'{x}' for x in entry.authors)}],\n")
+            f.write(f"    summary: {entry.summary},\n")
             f.write("  },\n")
         f.write("]\n")
 
