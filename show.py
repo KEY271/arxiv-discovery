@@ -32,7 +32,7 @@ def trusted(config):
     return trusted_filter
 
 def render_results(config):
-    with open("results.json5", "r", encoding="utf-8") as f:
+    with open("out/results.json5", "r", encoding="utf-8") as f:
         results = json5.load(f)
     env = Environment(loader=FileSystemLoader('.'), autoescape=select_autoescape(["html", "xml"]))
     env.filters["undump"] = undump
@@ -43,7 +43,7 @@ def render_results(config):
         "papers": results["papers"]
     }
     output = template.render(data)
-    with open("index.html", "w", encoding="utf-8") as f:
+    with open("out/index.html", "w", encoding="utf-8") as f:
         f.write(output)
 
 def main():
@@ -56,8 +56,8 @@ def main():
     server_thread = threading.Thread(target=server.serve_forever)
     server_thread.daemon = True
     server_thread.start()
-    print(f"Serving at http://localhost:{PORT}")
-    webbrowser.open(f"http://localhost:{PORT}")
+    print(f"Serving at http://localhost:{PORT}/out")
+    webbrowser.open(f"http://localhost:{PORT}/out")
     try:
         while(True):
             time.sleep(10000)

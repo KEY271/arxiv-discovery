@@ -87,7 +87,8 @@ def write_results(results: list[tuple[float, Entry]], now: datetime.datetime):
             for score, entry in results
         ]
     }
-    with open("results.json5", "w", encoding="utf-8") as f:
+    os.makedirs("out", exist_ok=True)
+    with open("out/results.json5", "w", encoding="utf-8") as f:
         f.write(json5.dumps(output, ensure_ascii=False, indent=2))
 
 def main():

@@ -12,7 +12,6 @@ dependencies = [
     { name = "json5" },
     { name = "numpy" },
     { name = "pylatexenc" },
-    { name = "scikit-learn" },
     { name = "sentence-transformers" },
 ]
 
@@ -23,7 +22,6 @@ requires-dist = [
     { name = "json5", specifier = ">=0.12.1" },
     { name = "numpy", specifier = ">=2.3.4" },
     { name = "pylatexenc", specifier = ">=2.10" },
-    { name = "scikit-learn", specifier = ">=1.7.2" },
     { name = "sentence-transformers", specifier = ">=5.1.2" },
 ]
 

@@ -1,19 +1,25 @@
 {
+    // Feed URLs to pull new papers from
     feeds: [
         "https://export.arxiv.org/rss/hep-th+cond-mat.str-el+math-ph",
     ],
+    // Authors whose papers you always want to see
     trusted_authors: [
         "Edward Witten",
     ],
+    // Keywords to filter papers by
     keywords: [
         "quantum field theory",
     ],
+    // Titles or abstracts of papers you liked
     liked_texts: [
-        "Quantum Field Theory and the Jones Polynomial"
+        "Quantum Field Theory and the Jones Polynomial",
     ],
+    // Scoring weights
     weights: {
         keywords: 3,
         liked_texts: 10,
     },
+    // Bonus score for trusted authors
     trusted_author_bonus: 10,
 }
