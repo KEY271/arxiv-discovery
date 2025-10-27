@@ -1,0 +1,14 @@
+[project]
+name = "arxiv-filter"
+version = "0.1.0"
+description = "arXiv の新着から良い感じの論文をフィルタリングするツール"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "feedparser>=6.0.12",
+    "json5>=0.12.1",
+    "numpy>=2.3.4",
+    "pylatexenc>=2.10",
+    "scikit-learn>=1.7.2",
+    "sentence-transformers>=5.1.2",
+]

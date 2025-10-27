@@ -1,0 +1,10 @@
+{
+    feeds: [
+        "https://export.arxiv.org/rss/hep-th",
+        "https://export.arxiv.org/rss/cond-mat.str-el",
+        "https://export.arxiv.org/rss/math-ph",
+    ],
+    trusted_authors: [
+        "Sheng-Jie Huang",
+    ],
+}
