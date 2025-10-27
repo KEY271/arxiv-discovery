@@ -75,7 +75,7 @@ def rank_papers(config, model: SentenceTransformer, entries: list[Entry], vec: n
     return results
 
 def write_results(results: list[tuple[float, bool, Entry]]):
-    with open("results.json5", "w") as f:
+    with open("results.json5", "w", encoding="utf-8") as f:
         f.write("[\n")
         for score, is_trusted, entry in results:
             f.write("  {\n")

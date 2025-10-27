@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>arXiv Filter</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex.min.css" integrity="sha384-WcoG4HRXMzYzfCgiyfrySxx90XSl2rxY5mnVY5TwtWE6KLrArNKn0T/mOgNL0Mmi" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex.min.js" integrity="sha384-J+9dG2KMoiR9hqcFao0IBLwxt6zpcyN68IgwzsCSkbreXUjmNVRhPFTssqdSGjwQ" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/contrib/auto-render.min.js" integrity="sha384-hCXGrW6PitJEwbkoStFjeJxv+fSOOQKOPbJxSfM6G5sWZjAyWhXiTIIAmQqnlLlh" crossorigin="anonymous"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            renderMathInElement(document.body, {
+                delimiters: [
+                {left: "$$", right: "$$", display: true},
+                {left: "\\[", right: "\\]", display: true},
+                {left: "$",  right: "$",  display: false},
+                {left: "\\(", right: "\\)", display: false},
+                ],
+                throwOnError: false
+            });
+        });
+    </script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+        }
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans JP", sans-serif;
+            line-height: 1.7;
+        }
+        main {
+            max-width: 860px;
+            margin: 0 auto;
+        }
+        article {
+            margin-bottom: 1rem;
+        }
+        h2 {
+            margin: 0 0 0.3rem;
+            font-size: 1.2rem;
+        }
+        a {
+            color: black;
+            text-decoration: none;
+        }
+        .link {
+            margin: 0 0 0.3rem;
+        }
+        .link a::before {
+            content: "Link: ";
+        }
+        .authors {
+            color: #555;
+            margin: 0 0 0.3rem;
+        }
+        .authors::before {
+            content: "Authors: ";
+        }
+        .author + .author::before {
+            content: ", ";
+        }
+        summary {
+            cursor: pointer;
+        }
+        .summary {
+            white-space: normal;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>arXiv Filter</h1>
+        {% for paper in papers %}
+        <article>
+            <h2><a href="{{ paper.link|undump|e }}">{{ paper.title|undump|e }}</a></h2>
+
+            <p class="score">
+                Score: {{ paper.score|undump|e }}
+            </p>
+
+            <p class="link">
+                <a href="{{ paper.link|undump|e }}">{{ paper.link|undump|e }}</a>
+            </p>
+
+            <p class="authors">
+            {%- for author in paper.authors -%}
+                <span class="author">{{ author|undump|e }}</span>
+            {%- endfor -%}
+            </p>
+
+            <div class="summary">
+                <details>
+                    <summary>Abstract</summary>
+                    {{ paper.summary|undump|e|replace('\n','<br>')|safe }}
+                </details>
+            </div>
+        </article>
+        {% endfor %}
+    </main>
+</body>
+</html>
