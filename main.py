@@ -6,6 +6,7 @@ from sentence_transformers import SentenceTransformer
 import numpy as np
 from pylatexenc.latex2text import LatexNodes2Text
 import unicodedata
+import time
 
 def load_settings() -> dict:
     if not os.path.exists("settings.json5"):
@@ -22,7 +23,10 @@ class Entry:
         self.authors = authors
 
 def normalize_text(text: str, L2T: LatexNodes2Text) -> str:
-    text = L2T.latex_to_text(text)
+    try:
+        text = L2T.latex_to_text(text)
+    except Exception:
+        pass
     text = unicodedata.normalize("NFC", text)
     return text
 
@@ -32,6 +36,7 @@ def fetch_feeds(config) -> list[Entry]:
     seen_links = set()
     for url in config["feeds"]:
         feed = feedparser.parse(url, sanitize_html=False)
+        pubdate = feed.feed.published_parsed
         for entry in feed.entries:
             announce_type = entry.get("arxiv_announce_type", "")
             link = entry["link"].strip()
@@ -42,7 +47,7 @@ def fetch_feeds(config) -> list[Entry]:
                 authors = [normalize_text(author.strip(), L2T) for author in entry.get("author", "").split(",")]
                 entries.append(Entry(normalize_text(entry["title"].strip(), L2T), entry["link"].strip(), desc, authors))
                 seen_links.add(link)
-    return entries
+    return pubdate, entries
 
 def create_preference_vector(config, model: SentenceTransformer) -> np.ndarray:
     vecs = []
@@ -72,10 +77,13 @@ def rank_papers(config, model: SentenceTransformer, entries: list[Entry], vec: n
     results.sort(key=lambda x: x[0], reverse=True)
     return results
 
-def write_results(results: list[tuple[float, Entry]], now: datetime.datetime):
+def write_results(results: list[tuple[float, Entry]], pubdate: time.struct_time, now: datetime.datetime):
     now_str = now.strftime("%Y-%m-%d %H:%M:%S")
+    pubdate_str1 = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.mktime(pubdate) + 9 * 3600))
+    pubdate_str2 = time.strftime("%Y-%m-%d", pubdate)
     output = {
         "fetched_at": now_str,
+        "pubdate": pubdate_str1,
         "papers": [
             {
                 "score": score,
@@ -88,7 +96,11 @@ def write_results(results: list[tuple[float, Entry]], now: datetime.datetime):
         ]
     }
     os.makedirs("out", exist_ok=True)
-    with open("out/results.json5", "w", encoding="utf-8") as f:
+    filename = f"out/results_{pubdate_str2}.json5"
+    if os.path.exists(filename):
+        print(f"Error: existing file {filename}")
+        return
+    with open(filename, "w", encoding="utf-8") as f:
         f.write(json5.dumps(output, ensure_ascii=False, indent=2))
 
 def main():
@@ -102,8 +114,9 @@ def main():
 
     print("Fetching new entries from feeds...", end="", flush=True)
     now = datetime.datetime.now()
-    entries = fetch_feeds(config)
+    pubdate, entries = fetch_feeds(config)
     print("Done.")
+    print("Feed published at (UTC):", time.strftime("%Y-%m-%d %H:%M:%S", pubdate))
     print("Total new entries fetched:", len(entries))
 
     print("Preparing preference vector...", end="", flush=True)
@@ -114,8 +127,8 @@ def main():
     results = rank_papers(config, model, entries, pref_vector)
     print("Done.")
 
-    print("Writing results to results.json5...", end="", flush=True)
-    write_results(results, now)
+    print("Writing results...", end="", flush=True)
+    write_results(results, pubdate, now)
     print("Done.")
 
 if __name__ == "__main__":

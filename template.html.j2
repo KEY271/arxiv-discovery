@@ -74,8 +74,9 @@
 </head>
 <body>
     <main>
-        <h1>arXiv Discovery</h1>
+        <h1><a href="/out">arXiv Discovery</a></h1>
         <p>Fetched at: {{ fetched_at|e }}</p>
+        <p>Published at: {{ pubdate|e }}</p>
         {% for paper in papers %}
         <article>
             <h2><a href="{{ paper.link|undump|e }}" target="_blank" rel="noopener noreferrer">{{ paper.title|undump|e }}</a></h2>

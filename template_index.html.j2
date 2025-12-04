@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>arXiv Discovery</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+        }
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans JP", sans-serif;
+            line-height: 1.7;
+        }
+        main {
+            max-width: 860px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>arXiv Discovery</h1>
+        <ul>
+            {% for date in results %}
+                <li><a href="/out/results_{{ date }}.html">{{ date }}</a></li>
+            {% endfor %}
+        </ul>
+    </main>
+</body>
+</html>

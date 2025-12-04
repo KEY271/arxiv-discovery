@@ -29,7 +29,7 @@ source .venv/bin/activate
 python main.py
 ```
 
-Then `out/results.json5` will be generated. To view the results in your browser, run:
+Then `out/results_{date}.json5` will be generated. To view the results in your browser, run:
 
 ```bash
 python show.py
